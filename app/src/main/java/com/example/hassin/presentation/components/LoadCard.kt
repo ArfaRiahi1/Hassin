@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -34,8 +36,9 @@ import com.example.hassin.domain.model.Load
 fun LoadCard(
     load: Load,
     enabled: Boolean,
-    onClick: () -> Unit
-) {
+    onClick: () -> Unit,
+    isLocked: Boolean,
+    ) {
     Card(
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -44,8 +47,9 @@ fun LoadCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
+
             Row(modifier = Modifier.fillMaxWidth()) {
-                
+
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(end = 8.dp)
@@ -76,7 +80,6 @@ fun LoadCard(
                     )
                 }
 
-
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         buildAnnotatedString {
@@ -96,6 +99,17 @@ fun LoadCard(
                             }
                             append(" (استان ${load.destinationProvince})")
                         }
+                    )
+                }
+
+                if (isLocked) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "locked",
+                        tint = Color(0xFFFF6A00),
+                        modifier = Modifier
+                            .padding(start = 8.dp, top = 8.dp)
+                            .size(18.dp)
                     )
                 }
             }
@@ -134,6 +148,7 @@ fun LoadCard(
                 )
             }
         }
+
     }
 }
 
@@ -157,6 +172,7 @@ fun PreviewLoadCard() {
     LoadCard(
         load = sampleLoad,
         enabled = true,
-        onClick = {}
+        onClick = {},
+        true
     )
 }

@@ -18,7 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hassin.presentation.components.LoadCard
@@ -48,8 +48,8 @@ fun LoadListScreen(viewModel: LoadViewModel = hiltViewModel()) {
                     action = {
                         if (actionLabel == "لغو بار") {
                             TextButton(onClick = {
-                                scope.launch { // Wrap suspend call in coroutine scope
-                                    viewModel.unassignLoad() // Assuming unassignLoad is suspend
+                                viewModel.unassignLoad()
+                                scope.launch {
                                     snackbarHostState.showSnackbar(
                                         message = "بار لغو شد.",
                                         actionLabel = "متوجه شدم",
@@ -57,7 +57,17 @@ fun LoadListScreen(viewModel: LoadViewModel = hiltViewModel()) {
                                     )
                                 }
                             }) {
-                                Text("لغو بار")
+                                Text(
+                                    text = actionLabel,
+                                    color = Color.Red
+                                )
+                            }
+                        } else {
+                            // برای سایر پیام‌ها، رنگ پیش‌فرض
+                            TextButton(onClick = {
+                                scope.launch { data.performAction() }
+                            }) {
+                                Text(text = actionLabel ?: "", color = Color.Black)
                             }
                         }
                     },
@@ -66,24 +76,32 @@ fun LoadListScreen(viewModel: LoadViewModel = hiltViewModel()) {
                     Text(text = message)
                 }
             }
+
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             LazyColumn(state = listState) {
                 items(viewModel.loads.size) { index ->
+                    val load = viewModel.loads[index]
+                    val isLocked =
+                        viewModel.assignedLoad != null && viewModel.assignedLoad?.id != load.id
+
                     LoadCard(
                         load = viewModel.loads[index],
-                        enabled = true
-                    ) {
-                        viewModel.selectLoad(viewModel.loads[index])
-                    }
+                        enabled = true,
+                        isLocked = isLocked,
+                        onClick = {
+                            viewModel.selectLoad(viewModel.loads[index])
+
+                        }
+                    )
                 }
             }
 
             val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
             LaunchedEffect(lastVisible) {
                 if (lastVisible != null && lastVisible >= viewModel.loads.size - 3) {
-                    viewModel.loadMore() // This is fine as it's inside LaunchedEffect
+                    viewModel.loadMore()
                 }
             }
             viewModel.selectedLoad?.let { load ->
@@ -101,12 +119,12 @@ fun LoadListScreen(viewModel: LoadViewModel = hiltViewModel()) {
                             viewModel.tryAssignLoad(
                                 load = load,
                                 onAlreadyAssigned = { assigned ->
-                                    scope.launch { // Wrap suspend calls in a coroutine scope
+                                    scope.launch {
                                         sheetState.hide()
                                         viewModel.clearSelection()
                                         snackbarHostState.currentSnackbarData?.dismiss()
                                         snackbarHostState.showSnackbar(
-                                            message = "شما قبلاً باری از ${assigned.originCity} → ${assigned.destinationCity} انتخاب کرده‌اید.",
+                                            message = "شما قبلاً باری از ${assigned.originCity} ← ${assigned.destinationCity} انتخاب کرده‌اید.",
                                             actionLabel = "لغو بار",
                                             duration = SnackbarDuration.Short
                                         )
