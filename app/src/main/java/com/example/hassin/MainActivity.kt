@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import com.example.hassin.presentation.ui.screens.LoadListWithBottomPanel
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import com.example.hassin.presentation.ui.screens.LoadListScreen
 import com.example.hassin.presentation.ui.theme.HassinTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,10 +22,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HassinTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(Modifier.padding(innerPadding)) {
-                        LoadListWithBottomPanel()
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                HassinTheme {
+                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        Box(Modifier.padding(innerPadding)) {
+                            LoadListScreen()
+                        }
                     }
                 }
             }

@@ -1,12 +1,12 @@
 package com.example.hassin.domain.usecase
 
-import com.example.hassin.domain.repository.LoadRepository
 import com.example.hassin.domain.model.Load
-import javax.inject.Inject
+import com.example.hassin.domain.repository.LoadRepository
 
-class GetLoadsUseCase @Inject constructor(
+class GetLoadsUseCase(
     private val repository: LoadRepository
 ) {
-    suspend operator fun invoke(page: Int, pageSize: Int): List<Load> =
-        repository.getLoads(page, pageSize)
+    suspend operator fun invoke(page: Int): List<Load> {
+        return repository.getLoads(page)
+    }
 }
